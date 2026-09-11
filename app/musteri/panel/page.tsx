@@ -1,10 +1,16 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { Bell, FileText, Heart, MessageCircle, Scale, Star } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { getSessionUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
 type QuickAction = [string, LucideIcon, string];
 
-export default function CustomerDashboard() {
+export default async function CustomerDashboard() {
+  const user = await getSessionUser();
+  if (!user || user.role !== 'CUSTOMER') redirect('/giris');
+
   const quickActions: QuickAction[] = [
     ['Yeni catering talebi', FileText, '/firma-ariyorum'],
     ['Karşılaştır', Scale, '/catering-firmalari'],
