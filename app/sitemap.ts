@@ -1,1 +1,9 @@
-import type {MetadataRoute} from 'next'; export default function sitemap():MetadataRoute.Sitemap{const base='https://catefind.example';return['/','/catering-firmalari','/firma-ariyorum','/hizmetler','/nasil-calisir','/blog'].map(path=>({url:base+path,lastModified:new Date()}))}
+import type { MetadataRoute } from 'next';
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const base = (process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000').replace(/\/$/, '');
+  return ['/', '/catering-firmalari', '/firma-ariyorum', '/hizmetler', '/nasil-calisir', '/blog', '/iletisim', '/favorilerim'].map(path => ({
+    url: `${base}${path}`,
+    lastModified: new Date()
+  }));
+}
