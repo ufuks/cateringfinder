@@ -1,9 +1,15 @@
+import { redirect } from 'next/navigation';
 import { BarChart3, Building2, FileText, Search, ShieldCheck, TrendingUp, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { getSessionUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
 type Kpi = [string, string, LucideIcon];
 
-export default function Admin() {
+export default async function Admin() {
+  const user = await getSessionUser();
+  if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) redirect('/giris');
+
   const k: Kpi[] = [
     ['Toplam firma', '1.284', Building2],
     ['Aktif müşteri', '8.421', Users],
