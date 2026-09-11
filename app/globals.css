@@ -1,0 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root{--primary:#426B2F;--primary-2:#557F3B;--primary-3:#6F9348;--dark:#17352A;--dark-2:#10271F;--bg:#F8FAF6;--text:#18201B;--muted:#5F685F;--border:#E3E9E1;--accent:#DDECCF}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Ubuntu,system-ui,sans-serif}.container{max-width:1180px;margin:0 auto;padding:0 24px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:10px;padding:13px 18px;font-weight:700;min-height:46px;transition:.2s}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--dark)}.btn-secondary{background:#fff;border:1px solid var(--border);color:var(--dark)}.btn-secondary:hover{border-color:var(--primary-3)}.card{background:#fff;border:1px solid var(--border);border-radius:18px}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--primary);font-weight:700}.muted{color:var(--muted)}

@@ -1,0 +1,1 @@
+import type {MetadataRoute} from 'next'; export default function manifest():MetadataRoute.Manifest{return{name:'CateFind',short_name:'CateFind',description:'Catering marketplace',start_url:'/',display:'standalone',background_color:'#F8FAF6',theme_color:'#426B2F',lang:'tr'}}

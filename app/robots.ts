@@ -1,0 +1,1 @@
+import type {MetadataRoute} from 'next'; export default function robots():MetadataRoute.Robots{return{rules:{userAgent:'*',allow:'/',disallow:['/admin/','/firma/panel/','/musteri/panel/','/mesajlar/','/api/']},sitemap:'https://catefind.example/sitemap.xml'}}

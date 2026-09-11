@@ -1,0 +1,1 @@
+import type {MetadataRoute} from 'next'; export default function sitemap():MetadataRoute.Sitemap{const base='https://catefind.example';return['/','/catering-firmalari','/firma-ariyorum','/hizmetler','/nasil-calisir','/blog'].map(path=>({url:base+path,lastModified:new Date()}))}

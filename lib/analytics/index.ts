@@ -1,0 +1,2 @@
+export type SafeAnalyticsEvent={name:string;sessionId:string;userId?:string;entityType?:string;entityId?:string;properties?:Record<string,string|number|boolean|null>};
+export function sanitizeAnalyticsProperties(input:Record<string,unknown>){const forbidden=['email','phone','name','address','ip','password','token'];return Object.fromEntries(Object.entries(input).filter(([k])=>!forbidden.includes(k.toLowerCase())))}

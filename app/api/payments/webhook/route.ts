@@ -1,0 +1,2 @@
+import {NextResponse} from 'next/server';
+export async function POST(req:Request){const signature=req.headers.get('x-iyzico-signature');if(!signature)return NextResponse.json({error:'Missing signature'},{status:401});const eventId=req.headers.get('x-event-id');if(!eventId)return NextResponse.json({error:'Missing event id'},{status:400});/* Production adapter: verify signature, persist eventId with a unique constraint, then transition subscription once. */return NextResponse.json({ok:true,eventId});}

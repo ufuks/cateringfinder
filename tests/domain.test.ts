@@ -1,0 +1,2 @@
+import {describe,it,expect} from 'vitest'; import {matchScore} from '../services/matching'; import {canTransition} from '../services/quotes';
+describe('domain rules',()=>{it('weighted match score is deterministic',()=>expect(matchScore({location:1,service:1,category:1,capacity:1,budget:1,rating:1,responseTime:1,profileCompleteness:1})).toBe(100));it('quote state machine blocks invalid transition',()=>{expect(canTransition('SENT','ACCEPTED')).toBe(true);expect(canTransition('ACCEPTED','SENT')).toBe(false)});});
