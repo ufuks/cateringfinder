@@ -25,4 +25,7 @@ Next.js App Router, React, TypeScript, Tailwind CSS, Prisma/PostgreSQL, Redis-re
 ## Mimari
 `services/` domain kurallarını, `lib/` altyapı adaptörlerini, `app/api/` HTTP katmanını, `prisma/` persistence katmanını taşır. UI bileşenleri DB sorgusu çalıştırmaz.
 
+## Kontroller
+GitHub Actions her `main` push ve pull request için Prisma generate, TypeScript typecheck, Vitest ve production build çalıştırır.
+
 Hukuki metinler (KVKK, açık rıza, üyelik sözleşmeleri vb.) production öncesinde profesyonel hukuk danışmanı tarafından sonlandırılmalıdır.
