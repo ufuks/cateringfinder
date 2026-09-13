@@ -1,16 +1,14 @@
-import { Header } from '@/components/header';
 import Link from 'next/link';
-import { ArrowRight, BriefcaseBusiness, CakeSlice, Coffee, GlassWater, HeartHandshake, Utensils } from 'lucide-react';
+import { ArrowRight, Building2, CakeSlice, GraduationCap, Martini, Utensils, Users } from 'lucide-react';
+import { Header } from '@/components/header';
 
-const services = [
-  ['Kurumsal Yemek', 'Ofis, fabrika ve çalışan yemekleri için düzenli catering çözümleri.', BriefcaseBusiness],
-  ['Düğün & Davet', 'Düğün, nişan, davet ve özel günler için uçtan uca organizasyon.', HeartHandshake],
-  ['Toplantı & Seminer', 'Toplantı, eğitim ve seminerler için zamanında teslimat ve servis.', Coffee],
-  ['Kokteyl & Davet', 'Kokteyl, lansman ve networking etkinlikleri için pratik menüler.', GlassWater],
-  ['Tatlı & Pastane', 'Kutlama ve etkinliklere uygun pasta, tatlı ve ikram seçenekleri.', CakeSlice],
-  ['Özel Menü', 'Vegan, vejetaryen, helal ve özel beslenme ihtiyaçlarına uygun seçenekler.', Utensils]
-] as const;
-
-export default function ServicesPage() {
-  return <><Header/><main className="container py-12"><div className="max-w-3xl"><div className="eyebrow">Hizmetler</div><h1 className="text-4xl font-bold mt-2">Etkinliğine uygun catering hizmetini bul</h1><p className="muted mt-4 text-lg leading-7">İhtiyacını paylaş, uygun catering firmalarını keşfet ve teklifleri tek yerde karşılaştır.</p></div><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">{services.map(([title,description,Icon])=><article className="card p-6" key={title}><div className="w-11 h-11 rounded-xl bg-cf-accent grid place-items-center text-cf-primary"><Icon size={21}/></div><h2 className="font-bold text-xl mt-5">{title}</h2><p className="muted mt-2 leading-6">{description}</p><Link href={`/catering-firmalari?category=${encodeURIComponent(title)}`} className="inline-flex items-center gap-1 text-cf-primary font-bold text-sm mt-5">Firmaları gör <ArrowRight size={16}/></Link></article>)}</div></main></>;
-}
+const services=[
+ ['Kurumsal Yemek','Ofis, fabrika ve kurumsal etkinlikler için düzenli veya tek seferlik toplu yemek hizmetleri.',Building2],
+ ['Düğün & Davet','Düğün, nişan, kına ve özel davetler için menü, servis ve organizasyon çözümleri.',CakeSlice],
+ ['Toplantı & Seminer','Toplantı, konferans ve seminerler için kahvaltı, öğle yemeği ve ikram paketleri.',Users],
+ ['Okul Yemekleri','Okullar ve eğitim kurumları için dengeli, planlı ve sürdürülebilir yemek hizmetleri.',GraduationCap],
+ ['VIP Catering','Özel davetler, lansmanlar ve üst segment organizasyonlar için kişiselleştirilmiş menüler.',Utensils],
+ ['Kokteyl','Karşılama, networking ve davetler için finger food, içecek ve servis çözümleri.',Martini],
+];
+export default function Services(){return <><Header/><main className="container"><section className="page-title"><div className="eyebrow">Hizmetler</div><h1>Etkinliğiniz için doğru catering çözümü</h1><p className="muted">İhtiyacınıza uygun hizmet kategorisini seçin, doğrulanmış firmaları karşılaştırın ve teklif isteyin.</p></section><section className="section" style={{paddingTop:20}}><div className="grid-3">{services.map(([title,desc,Icon])=>{const C=Icon as typeof Building2;return <article className="card category" key={String(title)}><div className="category-icon"><C size={20}/></div><h3>{title}</h3><p className="muted" style={{fontSize:13,lineHeight:1.7}}>{desc}</p><Link href={`/catering-firmalari?category=${encodeURIComponent(String(title))}`} style={{color:'var(--green)',fontWeight:800,fontSize:13}}>Firmaları keşfet →</Link></article>})}</div></section><section className="dark-band" style={{borderRadius:28,marginBottom:70}}><div className="container"><div className="eyebrow">Karar vermek kolay</div><h2 style={{fontSize:32,margin:'7px 0'}}>İhtiyacınızı anlatın, teklifleri biz eşleştirelim.</h2><p style={{color:'#c9d6d1',maxWidth:650}}>Etkinlik türünüzü, kişi sayınızı, konumunuzu ve bütçenizi paylaşın. Uygun catering firmalarından teklifleri tek yerde yönetin.</p><Link href="/firma-ariyorum" className="btn btn-light" style={{marginTop:20}}>Talep oluştur <ArrowRight size={17}/></Link></div></section></main><Footer/></>}
+function Footer(){return <footer className="footer"><div className="container footer-grid"><div><div className="logo"><span className="pin"/>CateFind</div><p className="muted">Catering firmaları ve müşteriler için güvenilir marketplace.</p></div><div><b>Keşfet</b><Link href="/catering-firmalari">Catering Firmaları</Link><Link href="/hizmetler">Hizmetler</Link><Link href="/firma-ariyorum">Firma Arıyorum</Link></div><div><b>Platform</b><Link href="/nasil-calisir">Nasıl Çalışır?</Link><Link href="/blog">Blog</Link><Link href="/iletisim">İletişim</Link></div><div><b>Yasal</b><Link href="#">KVKK</Link><Link href="#">Gizlilik</Link><Link href="#">Çerez Politikası</Link></div></div></footer>}
