@@ -6,12 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate --schema prisma/schema.fixed.prisma",
+    "db:migrate": "prisma migrate dev --schema prisma/schema.fixed.prisma",
     "db:seed": "tsx prisma/seed.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate --schema prisma/schema.fixed.prisma"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
