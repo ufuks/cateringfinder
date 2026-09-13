@@ -4,5 +4,293 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DB_URL")
+  url = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  passwordHash String?
+  name String
+  phone String?
+  role String @default("CUSTOMER")
+  emailVerifiedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  customerProfile CustomerProfile?
+  companyUsers CompanyUser[]
+  leads Lead[]
+  quotes Quote[]
+  conversationParticipants ConversationParticipant[]
+  messages Message[]
+  notifications Notification[]
+  blogPosts BlogPost[]
+}
+
+model CustomerProfile {
+  id String @id @default(cuid())
+  userId String @unique
+  cityId String?
+  districtId String?
+  bio String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Company {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
+  status String @default("PENDING")
+  verified Boolean @default(false)
+  description String?
+  foundedYear Int?
+  cityId String?
+  districtId String?
+  address String?
+  latitude Float?
+  longitude Float?
+  capacity Int?
+  responseMinutes Int?
+  rating Float @default(0)
+  reviewCount Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  users CompanyUser[]
+  profile CompanyProfile?
+  listings Listing[]
+  categories CompanyCategory[]
+  leads LeadCompanyMatch[]
+  quotes Quote[]
+}
+
+model CompanyUser {
+  companyId String
+  userId String
+  role String @default("OWNER")
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([companyId, userId])
+}
+
+model CompanyProfile {
+  id String @id @default(cuid())
+  companyId String @unique
+  logoUrl String?
+  coverUrl String?
+  website String?
+  services Json?
+  cuisines Json?
+  serviceAreas Json?
+  paymentOptions Json?
+  completeness Int @default(0)
+  seoTitle String?
+  seoDescription String?
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
+  active Boolean @default(true)
+  listings Listing[]
+  companies CompanyCategory[]
+}
+
+model CompanyCategory {
+  companyId String
+  categoryId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([companyId, categoryId])
+}
+
+model City {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
+}
+
+model Listing {
+  id String @id @default(cuid())
+  companyId String
+  categoryId String?
+  cityId String?
+  title String
+  slug String @unique
+  subtitle String?
+  description String?
+  status String @default("DRAFT")
+  priceFrom Decimal?
+  priceType String?
+  minPeople Int?
+  maxPeople Int?
+  setup Boolean @default(false)
+  staff Boolean @default(false)
+  delivery Boolean @default(false)
+  vegan Boolean @default(false)
+  vegetarian Boolean @default(false)
+  glutenFree Boolean @default(false)
+  halal Boolean @default(false)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  media ListingMedia[]
+}
+
+model ListingMedia {
+  id String @id @default(cuid())
+  listingId String
+  url String
+  type String
+  alt String?
+  sortOrder Int @default(0)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model SubscriptionPlan {
+  id String @id @default(cuid())
+  code String @unique
+  name String
+  priceMonthly Decimal
+  priceYearly Decimal
+  trialDays Int @default(0)
+  active Boolean @default(true)
+  features Json
+  limits Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id String @id @default(cuid())
+  customerId String
+  title String
+  eventDate DateTime?
+  eventType String?
+  address String?
+  cityId String?
+  districtId String?
+  people Int?
+  budgetMin Decimal?
+  budgetMax Decimal?
+  requirements Json?
+  notes String?
+  status String @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  customer User @relation(fields: [customerId], references: [id])
+  matches LeadCompanyMatch[]
+  quotes Quote[]
+}
+
+model LeadCompanyMatch {
+  leadId String
+  companyId String
+  score Float
+  matchedAt DateTime @default(now())
+  viewedAt DateTime?
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@id([leadId, companyId])
+}
+
+model Quote {
+  id String @id @default(cuid())
+  leadId String
+  companyId String
+  customerId String
+  total Decimal
+  perPerson Decimal?
+  menu Json?
+  includedServices Json?
+  tax Decimal?
+  discount Decimal?
+  validUntil DateTime?
+  description String?
+  status String @default("DRAFT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id])
+  customer User @relation(fields: [customerId], references: [id])
+  history QuoteStatusHistory[]
+}
+
+model QuoteStatusHistory {
+  id String @id @default(cuid())
+  quoteId String
+  fromStatus String?
+  toStatus String
+  actorId String
+  createdAt DateTime @default(now())
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id String @id @default(cuid())
+  leadId String?
+  quoteId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  participants ConversationParticipant[]
+  messages Message[]
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id String @id @default(cuid())
+  conversationId String
+  senderId String
+  text String?
+  type String @default("text")
+  status String @default("SENT")
+  createdAt DateTime @default(now())
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  title String
+  body String
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnalyticsEvent {
+  id String @id @default(cuid())
+  name String
+  sessionId String
+  userId String?
+  entityType String?
+  entityId String?
+  properties Json?
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id String @id @default(cuid())
+  title String
+  slug String @unique
+  excerpt String?
+  content String
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
 }
