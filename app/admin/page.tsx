@@ -1,111 +1,26 @@
 import { redirect } from 'next/navigation';
-import { BarChart3, Building2, FileText, Search, ShieldCheck, TrendingUp, Users } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { BarChart3, ShieldCheck, Search } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
+import { DashboardShell, PageHeader, StatsRow } from '@/components/lumen-marketplace';
+import { Stat } from '@santi020k/lumen-react';
+import '@santi020k/lumen-react/styles.css';
 
 export const dynamic = 'force-dynamic';
-type Kpi = [string, string, LucideIcon];
-
-const kpis: Kpi[] = [
-  ['Toplam firma', '1.284', Building2],
-  ['Aktif müşteri', '8.421', Users],
-  ['Toplam lead', '3.842', FileText],
-  ['MRR', '₺2.84M', TrendingUp],
-];
-
 const searchRows = [
-  ['istanbul catering', '12.450', '4.8'],
-  ['kadıköy catering', '8.500', '11.4'],
-  ['düğün catering fiyatları', '6.210', '7.2'],
-  ['vegan catering', '4.880', '5.9'],
-];
-
-const navigation = [
-  'Firmalar',
-  'Başvurular',
-  'İlanlar',
-  'Müşteri Talepleri',
-  'Teklifler',
-  'Yorumlar',
-  'Abonelikler',
-  'Audit Logs',
+  ['istanbul catering', '12.450', '4.8'], ['kadıköy catering', '8.500', '11.4'], ['düğün catering fiyatları', '6.210', '7.2'], ['vegan catering', '4.880', '5.9'],
 ];
 
 export default async function Admin() {
   const user = await getSessionUser();
   if (!user || !['ADMIN', 'SUPER_ADMIN'].includes(user.role)) redirect('/giris');
-
-  return (
-    <main className="min-h-screen bg-cf-dark text-white">
-      <div className="container py-8">
-        <header className="flex items-center justify-between">
-          <div>
-            <div className="text-cf-accent text-xs font-bold uppercase tracking-widest">Operations</div>
-            <h1 className="text-3xl font-bold mt-2">CateFind Admin</h1>
-          </div>
-          <div className="text-sm text-white/60">Tüm platform · Eylül 2026</div>
-        </header>
-
-        <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8" aria-label="KPI özeti">
-          {kpis.map(([title, value, Icon]) => (
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-5" key={title}>
-              <Icon className="text-cf-accent" size={19} />
-              <div className="text-white/60 text-sm mt-4">{title}</div>
-              <div className="text-2xl font-bold mt-1">{value}</div>
-            </div>
-          ))}
-        </section>
-
-        <div className="grid lg:grid-cols-2 gap-5 mt-6">
-          <section className="rounded-2xl bg-white text-cf-text p-6">
-            <div className="flex justify-between">
-              <div>
-                <h2 className="font-bold text-xl">Lead & teklif trendi</h2>
-                <p className="muted text-sm mt-1">Son 30 gün</p>
-              </div>
-              <BarChart3 className="text-cf-primary" />
-            </div>
-            <div className="h-64 flex items-end gap-1 mt-5" aria-label="Lead ve teklif trend grafiği">
-              {[42, 55, 47, 65, 59, 73, 68, 82, 75, 91, 84, 96].map((height, index) => (
-                <div
-                  key={index}
-                  className="flex-1 bg-cf-primary rounded-t"
-                  style={{ height: `${height}%` }}
-                  aria-hidden="true"
-                />
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-2xl bg-white text-cf-text p-6">
-            <div className="flex items-center gap-2">
-              <Search className="text-cf-primary" />
-              <h2 className="font-bold text-xl">SEO & Search Intelligence</h2>
-            </div>
-            <div className="grid gap-3 mt-6">
-              {searchRows.map(([query, impressions, position]) => (
-                <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-cf-border pb-3 text-sm" key={query}>
-                  <b>{query}</b>
-                  <span>{impressions} gösterim</span>
-                  <span className="text-cf-primary font-bold">{position}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 rounded-xl bg-cf-accent p-4 text-sm">
-              <ShieldCheck size={17} className="inline mr-2 text-cf-primary" />
-              <b>Fırsat:</b> “kadıköy catering” 1. sayfaya yakın. Landing page içeriğini güçlendir.
-            </div>
-          </section>
-        </div>
-
-        <nav className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 mt-6" aria-label="Yönetim bölümleri">
-          {navigation.map((item) => (
-            <button key={item} type="button" className="p-4 rounded-xl bg-white/5 border border-white/10 text-left text-sm font-bold hover:bg-white/10">
-              {item}
-            </button>
-          ))}
-        </nav>
-      </div>
-    </main>
-  );
+  return <DashboardShell role="Admin" active="Dashboard">
+    <PageHeader eyebrow="Operations" title="Dashboard" description="CateFind platformunun operasyon, kullanıcı, firma ve talep performansını tek ekrandan izleyin." />
+    <StatsRow items={[{label:'Toplam Firma',value:'245'},{label:'Toplam Kullanıcı',value:'1.234'},{label:'Toplam Talep',value:'567'},{label:'Toplam Teklif',value:'890'}]} />
+    <div className="mt-8 grid gap-6 xl:grid-cols-2">
+      <section className="card bg-white p-6"><div className="flex items-center justify-between"><div><h2 className="text-xl font-bold">Son 6 Ay Talep Grafiği</h2><p className="muted mt-1 text-sm">Marketplace hareketliliği</p></div><BarChart3 className="text-cf-primary"/></div><div className="mt-8 flex h-56 items-end gap-3">{[42,55,48,68,61,84,92].map((h,i)=><div key={i} className="flex-1 rounded-t-lg bg-cf-primary" style={{height:`${h}%`}}/>)}</div><div className="mt-3 flex justify-between text-xs muted"><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span><span>Tem</span><span>Ağu</span><span>Eyl</span></div></section>
+      <section className="card bg-white p-6"><div className="flex items-center gap-2"><Search className="text-cf-primary"/><div><h2 className="text-xl font-bold">Son Kayıt Olan Firmalar</h2><p className="muted mt-1 text-sm">Son 7 gün</p></div></div><div className="mt-6 space-y-4">{['Evin Yemekleri','Şefin Sofrası','Anadolu Catering','Marin Food'].map((name,i)=><div key={name} className="flex items-center justify-between border-b border-cf-border pb-4"><div><b>{name}</b><div className="mt-1 text-xs muted">{i+1} gün önce · İstanbul</div></div><span className="rounded-full bg-cf-accent px-2.5 py-1 text-xs font-bold text-cf-primary">Onay bekliyor</span></div>)}</div></section>
+    </div>
+    <section className="mt-6 card bg-white p-6"><h2 className="text-xl font-bold">SEO & Search Intelligence</h2><div className="mt-5 grid gap-3">{searchRows.map(([q,imp,pos])=><div key={q} className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-cf-border pb-3 text-sm"><b>{q}</b><span className="muted">{imp} gösterim</span><span className="font-bold text-cf-primary">{pos}</span></div>)}</div><div className="mt-5 rounded-xl bg-cf-accent p-4 text-sm"><ShieldCheck size={17} className="mr-2 inline text-cf-primary"/><b>Fırsat:</b> “kadıköy catering” landing page optimizasyonu için önceliklendirilebilir.</div></section>
+    <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Stat label="Yeni Firma Başvuruları" value="18"/><Stat label="Bekleyen Yorumlar" value="24"/><Stat label="Açık Talepler" value="67"/><Stat label="Platform Dönüşümü" value="8.4%"/></div>
+  </DashboardShell>;
 }
