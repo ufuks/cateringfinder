@@ -17,6 +17,12 @@ model User {
   emailVerifiedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  companyUsers CompanyUser[]
+  leads Lead[]
+  quotes Quote[]
+  conversationParticipants ConversationParticipant[]
+  notifications Notification[]
+  blogPosts BlogPost[]
 }
 
 model CustomerProfile {
@@ -27,6 +33,7 @@ model CustomerProfile {
   bio String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Company {
@@ -49,12 +56,20 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
+  users CompanyUser[]
+  profile CompanyProfile?
+  listings Listing[]
+  categories CompanyCategory[]
+  leads LeadCompanyMatch[]
+  quotes Quote[]
 }
 
 model CompanyUser {
   companyId String
   userId String
   role String @default("OWNER")
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@id([companyId, userId])
 }
 
@@ -72,6 +87,7 @@ model CompanyProfile {
   seoTitle String?
   seoDescription String?
   updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -79,12 +95,22 @@ model Category {
   name String
   slug String @unique
   active Boolean @default(true)
+  listings Listing[]
+  companies CompanyCategory[]
 }
 
 model CompanyCategory {
   companyId String
   categoryId String
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   @@id([companyId, categoryId])
+}
+
+model City {
+  id String @id @default(cuid())
+  name String
+  slug String @unique
 }
 
 model Listing {
@@ -111,6 +137,9 @@ model Listing {
   publishedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id])
+  media ListingMedia[]
 }
 
 model ListingMedia {
@@ -120,12 +149,7 @@ model ListingMedia {
   type String
   alt String?
   sortOrder Int @default(0)
-}
-
-model City {
-  id String @id @default(cuid())
-  name String
-  slug String @unique
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
 
 model SubscriptionPlan {
@@ -140,4 +164,131 @@ model SubscriptionPlan {
   limits Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id String @id @default(cuid())
+  customerId String
+  title String
+  eventDate DateTime?
+  eventType String?
+  address String?
+  cityId String?
+  districtId String?
+  people Int?
+  budgetMin Decimal?
+  budgetMax Decimal?
+  requirements Json?
+  notes String?
+  status String @default("OPEN")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  customer User @relation(fields: [customerId], references: [id])
+  matches LeadCompanyMatch[]
+  quotes Quote[]
+}
+
+model LeadCompanyMatch {
+  leadId String
+  companyId String
+  score Float
+  matchedAt DateTime @default(now())
+  viewedAt DateTime?
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  @@id([leadId, companyId])
+}
+
+model Quote {
+  id String @id @default(cuid())
+  leadId String
+  companyId String
+  customerId String
+  total Decimal
+  perPerson Decimal?
+  menu Json?
+  includedServices Json?
+  tax Decimal?
+  discount Decimal?
+  validUntil DateTime?
+  description String?
+  status String @default("DRAFT")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id])
+  customer User @relation(fields: [customerId], references: [id])
+  history QuoteStatusHistory[]
+}
+
+model QuoteStatusHistory {
+  id String @id @default(cuid())
+  quoteId String
+  fromStatus String?
+  toStatus String
+  actorId String
+  createdAt DateTime @default(now())
+  quote Quote @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id String @id @default(cuid())
+  leadId String?
+  quoteId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  participants ConversationParticipant[]
+  messages Message[]
+}
+
+model ConversationParticipant {
+  conversationId String
+  userId String
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([conversationId, userId])
+}
+
+model Message {
+  id String @id @default(cuid())
+  conversationId String
+  senderId String
+  text String?
+  type String @default("text")
+  status String @default("SENT")
+  createdAt DateTime @default(now())
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id])
+}
+
+model Notification {
+  id String @id @default(cuid())
+  userId String
+  type String
+  title String
+  body String
+  readAt DateTime?
+  createdAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AnalyticsEvent {
+  id String @id @default(cuid())
+  name String
+  sessionId String
+  userId String?
+  entityType String?
+  entityId String?
+  properties Json?
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id String @id @default(cuid())
+  title String
+  slug String @unique
+  excerpt String?
+  content String
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
 }
