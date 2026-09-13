@@ -1,3 +1,33 @@
 import {z} from 'zod';
-export const leadSchema=z.object({name:z.string().min(2),email:z.string().email(),phone:z.string().min(10),eventDate:z.string().optional(),eventType:z.string().min(2),city:z.string().min(2),district:z.string().optional(),people:z.coerce.number().int().min(1),budget:z.coerce.number().min(0),notes:z.string().max(2000).optional(),listingId:z.string().optional()});
-export const registerSchema=z.object({name:z.string().min(2),email:z.string().email(),password:z.string().min(8),role:z.enum(['CUSTOMER','COMPANY'])});
+
+const cleanText = (min: number, max: number) => z.string().trim().min(min).max(max);
+
+export const leadSchema = z.object({
+  name: cleanText(2, 120),
+  email: z.string().trim().email().max(254),
+  phone: z.string().trim().regex(/^[+\d\s().-]{10,20}$/),
+  eventDate: z.string().trim().refine((value) => !value || !Number.isNaN(Date.parse(value)), 'Geçerli bir tarih girin.').optional(),
+  eventType: cleanText(2, 100),
+  city: cleanText(2, 100),
+  district: z.string().trim().max(100).optional(),
+  people: z.coerce.number().int().min(1).max(100000),
+  budget: z.coerce.number().finite().min(0).max(1_000_000_000),
+  notes: z.string().trim().max(2000).optional(),
+  listingId: z.string().trim().min(1).max(100).optional(),
+}).strict();
+
+export const registerSchema = z.object({
+  name: cleanText(2, 120),
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
+  role: z.enum(['CUSTOMER', 'COMPANY']),
+}).strict();
+
+export const analyticsEventSchema = z.object({
+  name: z.string().trim().min(1).max(80).regex(/^[a-zA-Z0-9_.:-]+$/),
+  sessionId: z.string().trim().min(8).max(128),
+  userId: z.string().trim().min(1).max(100).optional(),
+  entityType: z.string().trim().max(50).optional(),
+  entityId: z.string().trim().max(100).optional(),
+  properties: z.record(z.union([z.string().max(500), z.number().finite(), z.boolean(), z.null()])).default({}),
+}).strict();

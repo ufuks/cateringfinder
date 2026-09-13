@@ -1,2 +1,17 @@
 import {NextResponse} from 'next/server';
-export async function POST(req:Request){const signature=req.headers.get('x-iyzico-signature');if(!signature)return NextResponse.json({error:'Missing signature'},{status:401});const eventId=req.headers.get('x-event-id');if(!eventId)return NextResponse.json({error:'Missing event id'},{status:400});/* Production adapter: verify signature, persist eventId with a unique constraint, then transition subscription once. */return NextResponse.json({ok:true,eventId});}
+import {parseWebhookHeaders} from '@/services/payments/webhook';
+
+export async function POST(req: Request) {
+  const headers = parseWebhookHeaders(req.headers);
+  if (!headers.ok) return NextResponse.json({error: headers.error}, {status: 401});
+
+  // iyzico's provider-specific signature verification and subscription transition
+  // must be completed before this endpoint is enabled in production.
+  // Returning 503 is intentional: acknowledging an unverified payment is unsafe.
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({error: 'Payment webhook integration is not configured.'}, {status: 503});
+  }
+
+  const payload = await req.text();
+  return NextResponse.json({ok: true, eventId: headers.eventId, testMode: true, payloadReceived: payload.length > 0});
+}

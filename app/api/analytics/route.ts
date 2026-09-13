@@ -1,2 +1,55 @@
-import {NextResponse} from 'next/server'; import {db} from '@/lib/db'; import {sanitizeAnalyticsProperties} from '@/lib/analytics';
-export async function POST(req:Request){const b=await req.json();if(typeof b?.name!=='string'||typeof b?.sessionId!=='string')return NextResponse.json({error:'Invalid event'},{status:400});const event=await db.analyticsEvent.create({data:{name:b.name,sessionId:b.sessionId,userId:typeof b.userId==='string'?b.userId:undefined,entityType:b.entityType,entityId:b.entityId,properties:sanitizeAnalyticsProperties(b.properties||{})}});return NextResponse.json({ok:true,id:event.id})}
+import {NextResponse} from 'next/server';
+import {db} from '@/lib/db';
+import {getSessionUser} from '@/lib/auth';
+import {analyticsEventSchema} from '@/lib/validation';
+
+const WINDOW_MS = 60_000;
+const MAX_EVENTS_PER_WINDOW = 60;
+const buckets = new Map<string, {startedAt: number; count: number}>();
+
+function rateLimitKey(req: Request, sessionId: string) {
+  const forwarded = req.headers.get('x-forwarded-for');
+  const ip = forwarded?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'unknown';
+  return `${ip}:${sessionId}`;
+}
+
+function allowedEvent(name: string) {
+  return /^(page_view|search|listing_view|lead_submit|quote_view|quote_accept|favorite|message_send|review_submit)(\.[a-z0-9_-]+)?$/.test(name);
+}
+
+function consumeRateLimit(key: string) {
+  const now = Date.now();
+  const bucket = buckets.get(key);
+  if (!bucket || now - bucket.startedAt >= WINDOW_MS) {
+    buckets.set(key, {startedAt: now, count: 1});
+    return true;
+  }
+  if (bucket.count >= MAX_EVENTS_PER_WINDOW) return false;
+  bucket.count += 1;
+  return true;
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = analyticsEventSchema.parse(await req.json());
+    if (!allowedEvent(body.name)) return NextResponse.json({error: 'Desteklenmeyen event.'}, {status: 400});
+    if (!consumeRateLimit(rateLimitKey(req, body.sessionId))) {
+      return NextResponse.json({error: 'Çok fazla analytics isteği.'}, {status: 429});
+    }
+
+    const user = await getSessionUser();
+    const event = await db.analyticsEvent.create({
+      data: {
+        name: body.name,
+        sessionId: body.sessionId,
+        userId: user?.id,
+        entityType: body.entityType,
+        entityId: body.entityId,
+        properties: body.properties,
+      },
+    });
+    return NextResponse.json({ok: true, id: event.id});
+  } catch {
+    return NextResponse.json({error: 'Invalid event'}, {status: 400});
+  }
+}
