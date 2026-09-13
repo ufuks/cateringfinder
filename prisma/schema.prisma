@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DB_URL")
+  url = env("DATABASE_URL")
 }
 
 model User {
@@ -17,8 +17,6 @@ model User {
   emailVerifiedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  customerProfile CustomerProfile?
-  companyUsers CompanyUser[]
 }
 
 model CustomerProfile {
@@ -29,7 +27,6 @@ model CustomerProfile {
   bio String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Company {
@@ -52,18 +49,12 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
-  users CompanyUser[]
-  profile CompanyProfile?
-  listings Listing[]
-  categories CompanyCategory[]
 }
 
 model CompanyUser {
   companyId String
   userId String
   role String @default("OWNER")
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@id([companyId, userId])
 }
 
@@ -81,7 +72,6 @@ model CompanyProfile {
   seoTitle String?
   seoDescription String?
   updatedAt DateTime @updatedAt
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Category {
@@ -89,15 +79,11 @@ model Category {
   name String
   slug String @unique
   active Boolean @default(true)
-  listings Listing[]
-  companies CompanyCategory[]
 }
 
 model CompanyCategory {
   companyId String
   categoryId String
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   @@id([companyId, categoryId])
 }
 
@@ -125,11 +111,6 @@ model Listing {
   publishedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id])
-  media ListingMedia[]
-  @@index([status, cityId, categoryId, publishedAt])
-  @@index([companyId, status])
 }
 
 model ListingMedia {
@@ -139,8 +120,6 @@ model ListingMedia {
   type String
   alt String?
   sortOrder Int @default(0)
-  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  @@index([listingId, sortOrder])
 }
 
 model City {
