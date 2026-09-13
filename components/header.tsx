@@ -1,2 +1,33 @@
-import Link from 'next/link'; import {Heart, Menu, Search, UtensilsCrossed} from 'lucide-react';
-export function Header(){return <header className="border-b border-cf-border bg-white/95 backdrop-blur sticky top-0 z-40"><div className="container h-[72px] flex items-center justify-between gap-6"><Link href="/" className="flex items-center gap-2 font-bold text-2xl text-cf-dark"><span className="w-10 h-10 rounded-xl bg-cf-primary text-white grid place-items-center"><UtensilsCrossed size={20}/></span>CateFind</Link><nav className="hidden lg:flex items-center gap-6 text-sm font-medium"><Link href="/catering-firmalari">Catering Firmaları</Link><Link href="/hizmetler">Hizmetler</Link><Link href="/firma-ariyorum">Firma Arıyorum</Link><Link href="/nasil-calisir">Nasıl Çalışır?</Link><Link href="/blog">Blog</Link><Link href="/iletisim">İletişim</Link></nav><div className="flex items-center gap-2"><Link href="/favorilerim" className="hidden sm:flex btn btn-secondary !min-h-10 !px-3" aria-label="Favorilerim"><Heart size={17}/></Link><Link href="/giris" className="hidden sm:block text-sm font-bold px-3">Giriş Yap</Link><Link href="/kayit?role=company" className="btn btn-primary !min-h-10 !px-4 text-sm">Firma Ol</Link><button className="lg:hidden p-2" aria-label="Menüyü aç"><Menu/></button></div></div></header>}
+import Link from 'next/link';
+import { Heart, Menu } from 'lucide-react';
+
+export function Header() {
+  return (
+    <header className="header">
+      <div className="container nav">
+        <Link href="/" className="logo" aria-label="CateFind ana sayfa">
+          <span className="pin" aria-hidden="true" />
+          CateFind
+        </Link>
+        <nav className="navlinks" aria-label="Ana navigasyon">
+          <Link href="/">Anasayfa</Link>
+          <Link href="/catering-firmalari">Firmalar</Link>
+          <Link href="/hizmetler">Hizmetler</Link>
+          <Link href="/nasil-calisir">Nasıl Çalışır?</Link>
+          <Link href="/blog">Blog</Link>
+          <Link href="/iletisim">İletişim</Link>
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link href="/favorilerim" className="btn btn-light hidden sm:inline-flex" aria-label="Favorilerim">
+            <Heart size={17} />
+          </Link>
+          <Link href="/giris" className="btn btn-light hidden sm:inline-flex">Giriş Yap</Link>
+          <Link href="/kayit?role=company" className="btn btn-green">Firma Ol</Link>
+          <button className="btn btn-light mobile-show" type="button" aria-label="Menüyü aç">
+            <Menu size={18} />
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
