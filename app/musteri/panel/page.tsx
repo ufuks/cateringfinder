@@ -1,23 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Bell, FileText, Heart, MessageCircle, Scale, Star } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { CalendarDays, FileText, Heart, MessageCircle, Plus, Star } from 'lucide-react';
 import { getSessionUser } from '@/lib/auth';
-
-export const dynamic = 'force-dynamic';
-type QuickAction = [string, LucideIcon, string];
-
-export default async function CustomerDashboard() {
-  const user = await getSessionUser();
-  if (!user || user.role !== 'CUSTOMER') redirect('/giris');
-
-  const quickActions: QuickAction[] = [
-    ['Yeni catering talebi', FileText, '/firma-ariyorum'],
-    ['Karşılaştır', Scale, '/catering-firmalari'],
-    ['Favorilerim', Heart, '/favorilerim'],
-    ['Mesajlar', MessageCircle, '#'],
-    ['Bildirimler', Bell, '#']
-  ];
-
-  return <main className="min-h-screen"><div className="container py-8"><div className="eyebrow">Müşteri Paneli</div><h1 className="text-3xl font-bold mt-2">Taleplerim</h1><div className="grid lg:grid-cols-[1fr_320px] gap-6 mt-7"><section className="grid gap-4"><div className="card p-5"><div className="flex justify-between"><div><span className="text-xs font-bold text-cf-primary">AÇIK TALEP</span><h2 className="font-bold text-xl mt-1">Kadıköy'de 300 kişilik düğün</h2><p className="muted text-sm mt-1">12 Ekim · İstanbul · 300 kişi</p></div><span className="bg-cf-accent rounded-full px-3 py-1 h-fit text-xs font-bold">4 firma eşleşti</span></div><div className="flex flex-wrap gap-2 mt-5"><Link href="/catering-firmalari" className="btn btn-primary">Teklifleri Gör</Link><Link href="#" className="btn btn-secondary">Mesajlar</Link></div></div><div className="card p-5"><div className="text-xs font-bold muted">SON TEKLİF</div><div className="flex items-center justify-between mt-2"><div><h2 className="font-bold">Premium Catering</h2><div className="flex gap-1 text-cf-primary mt-1"><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14} fill="currentColor"/><Star size={14}/></div></div><strong className="text-xl">₺68.500</strong></div><div className="mt-4 text-sm muted">Menü + servis + kurulum dahil · 30 Eylül'e kadar geçerli</div></div></section><aside className="card p-5"><h2 className="font-bold">Hızlı erişim</h2><div className="grid gap-2 mt-4">{quickActions.map(([x,I,href])=><Link href={href} key={x} className="p-3 rounded-xl hover:bg-cf-bg flex gap-3 items-center text-sm font-medium"><I size={17}/>{x}</Link>)}</div></aside></div></div></main>;
-}
+import { DashboardShell, StatsRow } from '@/components/lumen-marketplace';
+export const dynamic='force-dynamic';
+export default async function CustomerDashboard(){const user=await getSessionUser();if(!user||user.role!=='CUSTOMER')redirect('/giris');return <DashboardShell role="Müşteri" active="Ana Sayfa"><div className="dash-head" style={{marginBottom:20}}><div><div className="eyebrow">Müşteri Paneli</div><h1>Hoş geldin, {user.name}!</h1><p className="muted">Etkinliklerini, tekliflerini ve firmalarını tek yerden yönet.</p></div><Link href="/firma-ariyorum" className="btn btn-green"><Plus size={18}/> Yeni Talep</Link></div><StatsRow items={[{label:'Açık Talep',value:'3'},{label:'Teklif',value:'12'},{label:'Favori',value:'12'},{label:'Tamamlanan',value:'2'}]}/><div className="dash-grid" style={{marginTop:18}}><section className="card card-pad"><div className="section-head"><div><h2>Son Taleplerim</h2><p className="muted">Etkinlikleriniz için son durumlar</p></div><Link href="/musteri/talepler" style={{color:'var(--green)',fontWeight:800}}>Tümünü Gör →</Link></div><table className="table"><tbody><tr><th>Talep</th><th>Tarih</th><th>Durum</th></tr>{[['Şirket Yemeği','20 Eylül 2026','Teklif Bekleniyor','150 kişi'],['Düğün Organizasyonu','15 Ekim 2026','3 Teklif','300 kişi'],['Doğum Günü','5 Kasım 2026','2 Teklif','80 kişi']].map(([a,b,c,d])=><tr key={a}><td><b>{a}</b><div className="muted">{d}</div></td><td>{b}</td><td><span className="badge">{c}</span></td></tr>)}</tbody></table></section><aside className="card card-pad"><h2>Profil Durumu</h2><p className="muted">Bilgilerinizi tamamlayın.</p><div className="progress" style={{margin:'20px 0 8px'}}><i style={{width:'82%'}}/></div><b>%82 tamamlandı</b><div className="panel panel-soft" style={{marginTop:22}}><div style={{display:'flex',alignItems:'center',gap:8}}><Heart size={17} style={{color:'var(--green)'}}/><b>Favori firmalar</b></div><div style={{fontSize:27,fontWeight:900}}>12</div></div></aside></div><div className="grid-3" style={{marginTop:18}}>{[['Tekliflerim','12 teklif','Teklifleri karşılaştır',FileText,'/musteri/teklifler'],['Mesajlarım','3 okunmamış','Gelen kutusuna git',MessageCircle,'/musteri/mesajlar'],['Favorilerim','12 firma','Favorilerini görüntüle',Star,'/favorilerim']].map(([a,b,c,I,href])=>{const Icon=I as typeof FileText;return <Link href={String(href)} className="card card-pad" key={String(a)}><Icon size={20} style={{color:'var(--green)'}}/><h3>{a}</h3><div style={{fontSize:18,fontWeight:800}}>{b}</div><div className="muted" style={{fontSize:13}}>{c}</div></Link>})}</div></DashboardShell>}
