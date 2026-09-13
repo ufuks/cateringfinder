@@ -23,6 +23,13 @@ export const registerSchema = z.object({
   role: z.enum(['CUSTOMER', 'COMPANY']),
 }).strict();
 
+export const loginSchema = z.object({
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
+}).strict();
+
+export const verifyEmailSchema = z.object({token: z.string().trim().min(32).max(128)}).strict();
+
 export const analyticsEventSchema = z.object({
   name: z.string().trim().min(1).max(80).regex(/^[a-zA-Z0-9_.:-]+$/),
   sessionId: z.string().trim().min(8).max(128),
