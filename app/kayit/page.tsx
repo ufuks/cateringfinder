@@ -1,51 +1,12 @@
 'use client';
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { UserPlus } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, UserPlus } from 'lucide-react';
 
-function RegisterForm() {
-  const q = useSearchParams();
-  const [role, setRole] = useState<'CUSTOMER' | 'COMPANY'>(q.get('role') === 'company' ? 'COMPANY' : 'CUSTOMER');
-  const [msg, setMsg] = useState('');
-
-  async function submit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    const r = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: f.get('name'), email: f.get('email'), password: f.get('password'), role })
-    });
-    const j = await r.json();
-    setMsg(j.message || j.error);
-    if (r.ok) location.href = role === 'COMPANY' ? '/firma/panel' : '/musteri/panel';
-  }
-
-  return (
-    <main className="min-h-screen grid place-items-center p-6">
-      <div className="w-full max-w-md">
-        <a href="/" className="font-bold text-2xl text-cf-dark">CateFind</a>
-        <div className="card p-7 mt-6">
-          <div className="eyebrow">Kayıt</div>
-          <h1 className="text-3xl font-bold mt-2">Hesabını oluştur</h1>
-          <div className="grid grid-cols-2 gap-2 mt-6">
-            <button type="button" onClick={() => setRole('CUSTOMER')} className={`btn ${role === 'CUSTOMER' ? 'btn-primary' : 'btn-secondary'}`}>Müşteri</button>
-            <button type="button" onClick={() => setRole('COMPANY')} className={`btn ${role === 'COMPANY' ? 'btn-primary' : 'btn-secondary'}`}>Firma</button>
-          </div>
-          <form onSubmit={submit} className="grid gap-4 mt-5">
-            <input name="name" required placeholder="Ad Soyad / Firma yetkilisi" className="h-12 border rounded-xl px-3" />
-            <input name="email" required type="email" placeholder="E-posta" className="h-12 border rounded-xl px-3" />
-            <input name="password" required minLength={8} type="password" placeholder="En az 8 karakter" className="h-12 border rounded-xl px-3" />
-            <button className="btn btn-primary"><UserPlus size={17} />Kayıt Ol</button>
-          </form>
-          {msg && <p className="text-sm mt-4 text-cf-primary">{msg}</p>}
-          <p className="text-sm muted mt-5">Zaten hesabın var mı? <a className="text-cf-primary font-bold" href="/giris">Giriş yap</a></p>
-        </div>
-      </div>
-    </main>
-  );
+function RegisterForm(){
+  const q=useSearchParams(); const [role,setRole]=useState<'CUSTOMER'|'COMPANY'>(q.get('role')==='company'?'COMPANY':'CUSTOMER'); const [msg,setMsg]=useState(''); const [loading,setLoading]=useState(false);
+  async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();setLoading(true);setMsg('');try{const f=new FormData(e.currentTarget);const r=await fetch('/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:f.get('name'),email:f.get('email'),password:f.get('password'),role})});const j=await r.json();setMsg(j.message||j.error||'');if(r.ok) location.href=role==='COMPANY'?'/firma/panel':'/musteri/panel';}catch{setMsg('Sunucuya ulaşılamadı. Lütfen tekrar deneyin.')}finally{setLoading(false)}}
+  return <div className="auth"><section className="auth-side"><Link href="/" className="logo" style={{color:'#fff'}}><span className="pin" style={{background:'#49c98a'}}/>CateFind</Link><div style={{maxWidth:520}}><div className="eyebrow" style={{marginTop:55}}>CateFind'e katıl</div><h1>Doğru catering partnerini bulmanın en kolay yolu.</h1><p style={{color:'#c9d6d1',fontSize:17}}>Müşteri olarak teklif toplayın veya firma olarak yeni müşterilere ulaşın.</p><div className="hero-points"><span>✓ Hızlı teklif</span><span>✓ Doğrulanmış firmalar</span><span>✓ Güvenli iletişim</span></div></div></section><section className="auth-form"><div className="form-box"><div className="eyebrow">Kayıt</div><h1>Hesabını oluştur</h1><p className="muted">İhtiyacına uygun hesabı seç ve birkaç adımda başlayalım.</p><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:22}}><button type="button" onClick={()=>setRole('CUSTOMER')} className={`btn ${role==='CUSTOMER'?'btn-green':'btn-light'}`}>Müşteri</button><button type="button" onClick={()=>setRole('COMPANY')} className={`btn ${role==='COMPANY'?'btn-green':'btn-light'}`}>Firma</button></div><form onSubmit={submit} className="form-stack" style={{marginTop:14}}><div className="field"><label>AD SOYAD / YETKİLİ</label><input name="name" required placeholder="Ad Soyad" autoComplete="name"/></div><div className="field"><label>E-POSTA</label><input name="email" required type="email" placeholder="ornek@email.com" autoComplete="email"/></div><div className="field"><label>ŞİFRE</label><input name="password" required minLength={8} type="password" placeholder="En az 8 karakter" autoComplete="new-password"/></div><button className="btn btn-green" disabled={loading}>{loading?'Hesap oluşturuluyor…':<>Kayıt Ol <UserPlus size={17}/></>}</button></form>{msg&&<p className={msg.includes('başarı')?'form-success':'form-error'} style={{marginTop:14}}>{msg}</p>}<p className="muted" style={{fontSize:13,marginTop:20}}>Zaten hesabın var mı? <Link href="/giris" style={{color:'var(--green)',fontWeight:800}}>Giriş yap <ArrowRight size={13} style={{display:'inline'}}/></Link></p></div></section></div>;
 }
-
-export default function Register() {
-  return <Suspense fallback={<main className="min-h-screen grid place-items-center p-6">Yükleniyor…</main>}><RegisterForm /></Suspense>;
-}
+export default function Register(){return <Suspense fallback={<main className="auth-form">Yükleniyor…</main>}><RegisterForm/></Suspense>}
