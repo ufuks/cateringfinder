@@ -25,7 +25,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
       <div className="container max-w-3xl py-10">
         <Link href="/firma/ilanlar" className="inline-flex items-center gap-2 text-sm font-bold text-cf-primary"><ArrowLeft size={16} /> İlanlarıma dön</Link>
         <div className="mt-7"><div className="eyebrow">İlan Yönetimi</div><h1 className="mt-2 text-4xl font-bold">İlanı düzenle</h1><p className="muted mt-3">İlan bilgilerini güncelleyin. Aktif bir ilanı değiştirdiğinizde yeniden incelemeye alınır.</p></div>
-        <CompanyListingForm categories={categories} initial={{ ...listing, priceFrom: listing.priceFrom?.toString() ?? '' }} />
+        <CompanyListingForm categories={categories} initial={{ ...listing, description: listing.description ?? '', categoryId: listing.categoryId ?? '', priceFrom: listing.priceFrom?.toString() ?? '' }} />
       </div>
     </main>
   );
